@@ -1,4 +1,5 @@
-defmodule BlockWebsocketClient do
+defmodule Assignment.Clients.BlockWebsocket do
+  alias Assignment.Clients.Slack
   use WebSockex
   require Logger
   def start_link(url) do
@@ -35,6 +36,7 @@ defmodule BlockWebsocketClient do
     [{^tx_id, user_id}] = :ets.lookup(:pending_tx_ids, tx_id)
     :ets.delete(:pending_tx_ids, tx_id)
     Phoenix.PubSub.broadcast(Assignment.PubSub, user_id, "confirmed")
+    Slack.send_tx_status_message(user_id, tx_id, "confirmed")
     {:ok, state}
   end
 
@@ -44,6 +46,7 @@ defmodule BlockWebsocketClient do
     case event["transaction"] do
       %{"status" => _status} ->
         Phoenix.PubSub.broadcast(Assignment.PubSub, user_id, "pending")
+        Slack.send_tx_status_message(user_id, tx_id, "pending")
         {:ok, state}
       _ -> {:ok, state}
     end

@@ -1,5 +1,5 @@
 defmodule TxWebsocket do
-  alias BlockWebsocketClient
+  alias Assignment.Clients
   alias Phoenix.PubSub
   @behaviour Phoenix.Socket.Transport
 
@@ -27,7 +27,7 @@ defmodule TxWebsocket do
       {:ok, %{"tx_id" => tx_id}} ->
         pid = :global.whereis_name(:blocknative_client)
         :ets.insert(:pending_tx_ids, {tx_id, user_id})
-        BlockWebsocketClient.get_tx_status(pid, tx_id)
+        Clients.BlockWebsocket.get_tx_status(pid, tx_id)
         {:ok, state}
       _error -> {:reply, :error}
 
@@ -35,7 +35,6 @@ defmodule TxWebsocket do
   end
 
   def handle_info(message, state) do
-    IO.inspect message
     {:push, {:text, message}, state}
   end
 

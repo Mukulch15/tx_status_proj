@@ -17,7 +17,7 @@ defmodule AssignmentWeb.Router do
   scope "/", AssignmentWeb do
     pipe_through :api
 
-    get "pending_transactions", TransactionsController, :index
+    get "/pending_transactions", TransactionsController, :index
   end
 
   # Other scopes may use custom stacks.
@@ -49,7 +49,7 @@ defmodule AssignmentWeb.Router do
     scope "/dev" do
       pipe_through :browser
 
-      forward "/mailbox", Plug.Swoosh.MailboxPreview
+      # forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end
 end
