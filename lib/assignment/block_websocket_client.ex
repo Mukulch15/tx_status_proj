@@ -1,29 +1,21 @@
 defmodule BlockWebsocketClient do
   use WebSockex
   require Logger
-#   @initialize %{
-#     "timeStamp"=>"2021-01-11T06:21:40.197Z",
-#     "dappId"=>"a75f09b8-c506-43c3-a116-d0402152a676",
-#     "version"=>"1",
-#     "blockchain"=>%{
-#        "system"=>"ethereum",
-#        "network"=>"main"
-#     },
-#    "categoryCode"=> "initialize",
-#      "eventCode"=> "checkDappId"
-#  }
   def start_link(url) do
     WebSockex.start_link(url, __MODULE__, :blocknative)
   end
 
-  def echo(client, message) do
-    # Logger.info("Sending message: #{message}")
-    WebSockex.send_frame(client, {:text, Jason.encode!(message)})
+  def send_message(client, message) do
+    case Jason.encode(message) do
+      {:ok, msg} ->
+        WebSockex.send_frame(client, {:text, msg})
+      err -> err
+    end
   end
 
   def handle_connect(_conn, state) do
     Logger.info("Connected!")
-
+    :global.register_name(:blocknative_client, self())
     {:ok,state}
   end
 
@@ -31,13 +23,30 @@ defmodule BlockWebsocketClient do
     handle_message(Jason.decode(msg), state)
   end
 
+  # Private functions to transform incoming messages from blocknative
   defp handle_message({:ok,%{"event" => %{"categoryCode" => "initialize"}, "status" => "ok"}}, state) do
     Logger.info("Initialized!")
     {:ok, state}
   end
 
-  defp handle_message({:ok,%{"event" => %{"categoryCode" => "accountAddress"}, "status" => "ok"}} = msg, state) do
-    IO.inspect msg
+  defp handle_message({:ok,%{"event" =>%{"eventCode" => "txConfirmed"}, "status" => "ok"}} = msg, state) do
+    {:ok, msg} = msg
+    tx_id = msg["event"]["transaction"]["hash"]
+    [{^tx_id, user_id}] = :ets.lookup(:pending_tx_ids, tx_id)
+    :ets.delete(:pending_tx_ids, tx_id)
+    Phoenix.PubSub.broadcast(Assignment.PubSub, user_id, "confirmed")
+    {:ok, state}
+  end
+
+  defp handle_message({:ok,%{"event" => event, "status" => "ok"}}, state) do
+    tx_id = event["transaction"]["hash"]
+    [{^tx_id, user_id}] = :ets.lookup(:pending_tx_ids, tx_id)
+    case event["transaction"] do
+      %{"status" => _status} ->
+        Phoenix.PubSub.broadcast(Assignment.PubSub, user_id, "pending")
+        {:ok, state}
+      _ -> {:ok, state}
+    end
     {:ok, state}
   end
 
@@ -47,7 +56,7 @@ defmodule BlockWebsocketClient do
   end
 
   defp handle_message(msg, state) do
-    IO.inspect msg
+    Logger.info("Received from blocknative#{inspect(msg)}")
     {:ok, state}
   end
 
@@ -63,6 +72,11 @@ defmodule BlockWebsocketClient do
     }
   end
 
+  def get_tx_status(pid, tx_id) do
+    payload = make_tx_status_payload(tx_id)
+    send_message(pid, payload)
+  end
+
   defp make_initialization_payload do
     data = get_defaults()
     data
@@ -70,7 +84,7 @@ defmodule BlockWebsocketClient do
     |> Map.put( "eventCode", "checkDappId")
   end
 
-  def make_tx_status_payload do
+  defp make_tx_status_payload(tx_id) do
     data = get_defaults()
     data
     |> Map.put("categoryCode", "accountAddress")
@@ -78,8 +92,8 @@ defmodule BlockWebsocketClient do
     |> Map.put("transaction",
         %{}
         |> Map.put(
-        "hash", "0x9b7cb0553e1021f33e21ecac80e3433a645be31dda62e4248a3e03ce370a106b")
-        |> Map.put("id", "0x9b7cb0553e1021f33e21ecac80e3433a645be31dda62e4248a3e03ce370a106b"))
+        "hash", tx_id)
+        |> Map.put("id", tx_id))
 
   end
 

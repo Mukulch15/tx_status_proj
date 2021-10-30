@@ -21,6 +21,7 @@ defmodule Assignment.Application do
       # Start a worker by calling: Assignment.Worker.start_link(arg)
       # {Assignment.Worker, arg}
     ]
+    :ets.new(:pending_tx_ids, [:set, :public, :named_table])
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

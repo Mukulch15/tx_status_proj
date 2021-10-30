@@ -1,4 +1,5 @@
-defmodule EchoSocket do
+defmodule TxWebsocket do
+  alias BlockWebsocketClient
   alias Phoenix.PubSub
   @behaviour Phoenix.Socket.Transport
 
@@ -6,6 +7,7 @@ defmodule EchoSocket do
     %{id: Task, start: {Task, :start_link, [fn -> :ok end]}, restart: :transient}
   end
 
+  @spec connect(atom | %{:params => any, optional(any) => any}) :: :error | {:ok, %{user_id: any}}
   def connect(state) do
     case state.params do
       %{"user_id" => user_id} ->
@@ -16,19 +18,25 @@ defmodule EchoSocket do
   end
 
   def init(%{user_id: user_id} = state) do
-    IO.inspect self()
     PubSub.subscribe Assignment.PubSub, user_id
     {:ok, state}
   end
 
-  def handle_in({text, _opts}, state) do
-    IO.inspect self()
-    {:reply, :ok, {:text, text}, state}
+  def handle_in({text, _opts}, %{user_id: user_id} = state) do
+    case Jason.decode(text) do
+      {:ok, %{"tx_id" => tx_id}} ->
+        pid = :global.whereis_name(:blocknative_client)
+        :ets.insert(:pending_tx_ids, {tx_id, user_id})
+        BlockWebsocketClient.get_tx_status(pid, tx_id)
+        {:ok, state}
+      _error -> {:reply, :error}
+
+    end
   end
 
   def handle_info(message, state) do
     IO.inspect message
-    {:ok, state}
+    {:push, {:text, message}, state}
   end
 
   def terminate(_reason, _state) do
