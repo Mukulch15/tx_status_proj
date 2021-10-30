@@ -11,7 +11,7 @@ defmodule AssignmentWeb.Endpoint do
   ]
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
-  socket "/socket", EchoSocket, websocket: true, longpoll: true
+  socket "/socket", TxWebsocket, websocket: true, longpoll: true
 
   # Serve at "/" the static files from "priv/static" directory.
   #
