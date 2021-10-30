@@ -17,8 +17,7 @@ defmodule Assignment.Application do
       # Start the Endpoint (http/https)
       AssignmentWeb.Endpoint,
 
-      {BlockWebsocketClient, Application.get_env(:assignment, :blocknative_url, "wss://api.blocknative.com/v0")},
-      {Phoenix.PubSub, name: :assignment_pubsub}
+      {BlockWebsocketClient, Application.get_env(:assignment, :blocknative_url, "wss://api.blocknative.com/v0")}
       # Start a worker by calling: Assignment.Worker.start_link(arg)
       # {Assignment.Worker, arg}
     ]
