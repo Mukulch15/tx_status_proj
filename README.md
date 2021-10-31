@@ -17,3 +17,6 @@ To start your Phoenix server:
   * Install dependencies with `mix deps.get`
   * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
 
+To get pending transactions:
+GET http://localhost:4000/pending_transactions
+
