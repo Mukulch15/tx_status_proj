@@ -99,7 +99,13 @@ defmodule Assignment.Clients.BlockWebsocket do
     tx_id = msg["event"]["transaction"]["hash"]
     [{^tx_id, user_id}] = :ets.lookup(:pending_tx_ids, tx_id)
     :ets.delete(:pending_tx_ids, tx_id)
-    Phoenix.PubSub.broadcast(Assignment.PubSub, user_id, "confirmed")
+
+    Phoenix.PubSub.broadcast(
+      Assignment.PubSub,
+      user_id,
+      Jason.encode!(%{tx_id: tx_id, status: "confirmed"})
+    )
+
     Slack.send_tx_status_message(user_id, tx_id, "confirmed")
     {:ok, state}
   end
@@ -110,7 +116,12 @@ defmodule Assignment.Clients.BlockWebsocket do
 
     case event["transaction"] do
       %{"status" => _status} ->
-        Phoenix.PubSub.broadcast(Assignment.PubSub, user_id, "pending")
+        Phoenix.PubSub.broadcast(
+          Assignment.PubSub,
+          user_id,
+          Jason.encode!(%{tx_id: tx_id, status: "pending"})
+        )
+
         Slack.send_tx_status_message(user_id, tx_id, "pending")
         {:ok, state}
 
