@@ -26,8 +26,13 @@ config :assignment, AssignmentWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :assignment, Assignment.Mailer, adapter: Swoosh.Adapters.Local
 
+config :assignment,
+  blocknative_url: System.get_env("BLOCKNATIVE_URL"),
+  slack_url: System.get_env("SLACK_URL"),
+  dapp_id: System.get_env("DAPP_ID")
+
 # Swoosh API client is needed for adapters other than SMTP.
-config :swoosh, :api_client, false
+# config :swoosh, :api_client, false
 
 # Configure esbuild (the version is required)
 config :esbuild,
