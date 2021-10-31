@@ -19,7 +19,6 @@ defmodule Assignment.TxWebsocket do
     %{id: Task, start: {Task, :start_link, [fn -> :ok end]}, restart: :transient}
   end
 
-  @spec connect(atom | %{:params => any, optional(any) => any}) :: :error | {:ok, %{user_id: any}}
   def connect(state) do
     case state.params do
       %{"user_id" => user_id} ->
