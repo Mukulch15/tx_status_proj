@@ -4,6 +4,7 @@ services:
   phoenix:
     build:
       context: .
-    ports:
-      # Mapping the port to make the Phoenix app accessible outside of the container
-      - "55001:4000"
+    environment:
+      - BLOCKNATIVE_URL=wss://api.blocknative.com/v0
+      - SLACK_URL=https://hooks.slack.com/services/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
+      - DAPP_ID=a75f09b8-c506-43c3-a116-d0402152a676

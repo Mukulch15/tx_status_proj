@@ -36,14 +36,18 @@ defmodule Assignment.TxWebsocket do
 
   def handle_in({text, _opts}, %{user_id: user_id} = state) do
     case Jason.decode(text) do
-      {:ok, %{"tx_id" => tx_id}} ->
+      {:ok, %{"tx_ids" => tx_ids}} when is_list(tx_ids) ->
         pid = :global.whereis_name(:blocknative_client)
-        :ets.insert(:pending_tx_ids, {tx_id, user_id})
-        Clients.BlockWebsocket.get_tx_status(pid, tx_id)
+
+        Enum.each(tx_ids, fn tx_id ->
+          :ets.insert(:pending_tx_ids, {tx_id, user_id})
+          Clients.BlockWebsocket.get_tx_status(pid, tx_id)
+        end)
+
         {:ok, state}
 
       _error ->
-        {:reply, :error}
+        {:reply, :error, {:text, "Please check the request payload"}, state}
     end
   end
 

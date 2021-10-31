@@ -9,7 +9,7 @@ The blocknative url is `wss://api.blocknative.com/v0`
 
 To connect to the app websocket server:
 1. Use the url `ws://localhost:4000/socket/websocket?user_id=<user_id>`
-2. Send json payload `{"tx_id": <transaction_hash>}`
+2. Send json payload `{"tx_ids": [<transaction_hashes>]}`
 3. You will be replied with the status of the pending transaction and a message will be sent over the slack webhook as well.
 
 To start your Phoenix server:
