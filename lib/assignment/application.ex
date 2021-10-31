@@ -16,11 +16,12 @@ defmodule Assignment.Application do
       {Phoenix.PubSub, name: Assignment.PubSub},
       # Start the Endpoint (http/https)
       AssignmentWeb.Endpoint,
-
-      {Assignment.Clients.BlockWebsocket, Application.get_env(:assignment, :blocknative_url, "wss://api.blocknative.com/v0")}
+      {Assignment.Clients.BlockWebsocket,
+       Application.get_env(:assignment, :blocknative_url, "wss://api.blocknative.com/v0")}
       # Start a worker by calling: Assignment.Worker.start_link(arg)
       # {Assignment.Worker, arg}
     ]
+
     :ets.new(:pending_tx_ids, [:set, :public, :named_table])
 
     # See https://hexdocs.pm/elixir/Supervisor.html

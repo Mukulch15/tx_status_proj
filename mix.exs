@@ -50,7 +50,8 @@ defmodule Assignment.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:websockex, "~> 0.4.3"},
       {:mime, "~> 1.0.0"},
-      {:tesla, "~> 1.4"}
+      {:tesla, "~> 1.4"},
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
     ]
   end
 

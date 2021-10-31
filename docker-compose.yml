@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  phoenix:
+    build:
+      context: .
+    ports:
+      # Mapping the port to make the Phoenix app accessible outside of the container
+      - "55001:4000"
