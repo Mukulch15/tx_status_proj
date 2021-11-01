@@ -158,7 +158,7 @@ defmodule Assignment.Clients.BlockWebsocket do
     {:ok, state}
   end
 
-  defp get_defaults do
+  defp defaults do
     %{
       "timeStamp" => DateTime.to_iso8601(DateTime.now!("Etc/UTC")),
       "dappId" => Application.get_env(:assignment, :dapp_id),
@@ -179,7 +179,7 @@ defmodule Assignment.Clients.BlockWebsocket do
   end
 
   defp make_initialization_payload do
-    data = get_defaults()
+    data = defaults()
 
     data
     |> Map.put("categoryCode", "initialize")
@@ -187,7 +187,7 @@ defmodule Assignment.Clients.BlockWebsocket do
   end
 
   defp make_tx_status_payload(tx_id) do
-    data = get_defaults()
+    data = defaults()
 
     data
     |> Map.put("categoryCode", "accountAddress")
