@@ -28,10 +28,6 @@ config :assignment, AssignmentWeb.Endpoint,
     esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]}
   ]
 
-config :assignment,
-  blocknative_url: "wss://api.blocknative.com/v0"
-
-# blocknative_url: "ws://127.0.0.1:4000/socket/websocket"
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed

@@ -60,16 +60,6 @@ defmodule Assignment.Clients.BlockWebsocket do
   alias Assignment.Clients.Slack
   use WebSockex
   require Logger
-
-  @defaults %{
-    "timeStamp" => DateTime.to_iso8601(DateTime.now!("Etc/UTC")),
-    "dappId" => Application.get_env(:assignment, :dapp_id),
-    "version" => "1",
-    "blockchain" => %{
-      "system" => "ethereum",
-      "network" => "main"
-    }
-  }
   @doc false
   def start_link(url) do
     WebSockex.start_link(url, __MODULE__, :blocknative)
@@ -169,6 +159,18 @@ defmodule Assignment.Clients.BlockWebsocket do
     {:ok, state}
   end
 
+  defp get_defaults do
+    %{
+      "timeStamp" => DateTime.to_iso8601(DateTime.now!("Etc/UTC")),
+      "dappId" => Application.get_env(:assignment, :dapp_id),
+      "version" => "1",
+      "blockchain" => %{
+        "system" => "ethereum",
+        "network" => "main"
+      }
+    }
+  end
+
   @doc """
     This method creates a request payload for getting transaction status and sends it to blocknative websocket server.
   """
@@ -178,13 +180,17 @@ defmodule Assignment.Clients.BlockWebsocket do
   end
 
   defp make_initialization_payload do
-    @defaults
+    data = get_defaults()
+
+    data
     |> Map.put("categoryCode", "initialize")
     |> Map.put("eventCode", "checkDappId")
   end
 
   defp make_tx_status_payload(tx_id) do
-    @defaults
+    data = get_defaults()
+
+    data
     |> Map.put("categoryCode", "accountAddress")
     |> Map.put("eventCode", "txSent")
     |> Map.put(
