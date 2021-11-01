@@ -42,6 +42,7 @@ defmodule Assignment.TxWebsocket do
         Enum.each(tx_ids, fn tx_id ->
           :ets.insert(:pending_tx_ids, {tx_id, user_id})
           Clients.BlockWebsocket.get_tx_status(pid, tx_id)
+          :timer.send_after(120_000, pid, {:check_tx_status, tx_id})
         end)
 
         {:ok, state}

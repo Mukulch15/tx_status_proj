@@ -79,6 +79,18 @@ defmodule Assignment.Clients.BlockWebsocket do
     {:ok, state}
   end
 
+  def handle_info({:check_tx_status, tx_id}, state) do
+    case :ets.lookup(:pending_tx_ids, tx_id) do
+      [{^tx_id, user_id}] ->
+        Slack.send_tx_status_message(user_id, tx_id, "pending")
+
+      _ ->
+        :ok
+    end
+
+    {:ok, state}
+  end
+
   def handle_frame({:text, msg}, state) do
     handle_message(Jason.decode(msg), state)
   end
