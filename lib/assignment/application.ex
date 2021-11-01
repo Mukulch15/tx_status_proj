@@ -14,10 +14,11 @@ defmodule Assignment.Application do
       AssignmentWeb.Telemetry,
       # Start the PubSub system
       {Phoenix.PubSub, name: Assignment.PubSub},
-      # Start the Endpoint (http/https)
-      AssignmentWeb.Endpoint,
       {Assignment.Clients.BlockWebsocket,
-       Application.get_env(:assignment, :blocknative_url, "wss://api.blocknative.com/v0")}
+       Application.get_env(:assignment, :blocknative_url, "wss://api.blocknative.com/v0")},
+      # Start the Endpoint (http/https)
+      AssignmentWeb.Endpoint
+
       # Start a worker by calling: Assignment.Worker.start_link(arg)
       # {Assignment.Worker, arg}
     ]

@@ -153,6 +153,19 @@ defmodule Assignment.Clients.BlockWebsocket do
     {:reply, {:text, Jason.encode!(initialization_request)}, state}
   end
 
+  defp handle_message({:ok, %{"status" => "error", "reason" => reason, "event" => event}}, state) do
+    tx_id = event["transaction"]["hash"]
+    [{^tx_id, user_id}] = :ets.lookup(:pending_tx_ids, tx_id)
+
+    Phoenix.PubSub.broadcast(
+      Assignment.PubSub,
+      user_id,
+      Jason.encode!(%{tx_id: tx_id, status: "error", reason: reason})
+    )
+
+    {:ok, state}
+  end
+
   defp handle_message(msg, state) do
     Logger.info("Received from blocknative#{inspect(msg)}")
     {:ok, state}
