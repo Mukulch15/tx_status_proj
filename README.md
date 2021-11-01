@@ -27,7 +27,5 @@ The above api is written so that in case the user websocket disconnects before t
 the front end can call the api to get all the list of confirmed transactions within the timeframe.
 
 Caveats:
-Currently there is an issue with the blocknative api server (both the http webhhok and websocket), if a transaction has crossed 
-certain threshold in time(a couple of hours), there's a chance that if you send a request for transaction status, you won't get 
-any status updates. Haven't been able to solve this within the time frame.
+Currently there is an issue with the blocknative api server (both the http webhhook and websocket). If a transaction has crossed a certain threshold in time(a couple of hours), there's a chance that if you send a request for transaction status, you won't get any status updates. Haven't been able to solve this within the time frame.
 
