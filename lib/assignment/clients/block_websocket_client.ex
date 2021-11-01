@@ -100,6 +100,15 @@ defmodule Assignment.Clients.BlockWebsocket do
     handle_message(Jason.decode(msg), state)
   end
 
+  @doc """
+    This method creates a request payload for getting transaction status and sends it to blocknative websocket server.
+  """
+  def get_tx_status(pid, tx_id) do
+    payload = make_tx_status_payload(tx_id)
+    send_message(pid, payload)
+  end
+
+
   # Private functions to handle incoming messages
   defp handle_message(
          {:ok, %{"event" => %{"categoryCode" => "initialize"}, "status" => "ok"}},
@@ -181,14 +190,6 @@ defmodule Assignment.Clients.BlockWebsocket do
         "network" => "main"
       }
     }
-  end
-
-  @doc """
-    This method creates a request payload for getting transaction status and sends it to blocknative websocket server.
-  """
-  def get_tx_status(pid, tx_id) do
-    payload = make_tx_status_payload(tx_id)
-    send_message(pid, payload)
   end
 
   defp make_initialization_payload do
