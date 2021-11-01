@@ -23,6 +23,7 @@ defmodule Assignment.Application do
     ]
 
     :ets.new(:pending_tx_ids, [:set, :public, :named_table])
+    :ets.new(:confirmed_tx_ids, [:bag, :public, :named_table])
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

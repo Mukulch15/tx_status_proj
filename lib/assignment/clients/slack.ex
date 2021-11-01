@@ -1,4 +1,5 @@
 defmodule Assignment.Clients.Slack do
+  @moduledoc false
   def send_tx_status_message(user_id, tx_id, status) do
     payload = %{
       "blocks" => [

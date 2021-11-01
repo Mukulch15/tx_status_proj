@@ -18,6 +18,7 @@ defmodule AssignmentWeb.Router do
     pipe_through :api
 
     get "/pending_transactions", TransactionsController, :index
+    get "/confirmed_transactions", TransactionsController, :get_confirmed_txs
   end
 
   # Other scopes may use custom stacks.

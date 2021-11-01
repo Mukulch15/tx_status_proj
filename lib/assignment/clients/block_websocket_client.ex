@@ -99,6 +99,7 @@ defmodule Assignment.Clients.BlockWebsocket do
     tx_id = msg["event"]["transaction"]["hash"]
     [{^tx_id, user_id}] = :ets.lookup(:pending_tx_ids, tx_id)
     :ets.delete(:pending_tx_ids, tx_id)
+    :ets.insert(:confirmed_tx_ids, {user_id, tx_id})
 
     Phoenix.PubSub.broadcast(
       Assignment.PubSub,

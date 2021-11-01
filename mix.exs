@@ -51,7 +51,8 @@ defmodule Assignment.MixProject do
       {:websockex, "~> 0.4.3"},
       {:mime, "~> 1.0.0"},
       {:tesla, "~> 1.4"},
-      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false},
+      {:credo, "~> 1.5", only: [:dev, :test], runtime: false}
     ]
   end
 
