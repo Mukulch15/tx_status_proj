@@ -17,7 +17,6 @@ defmodule Assignment.Clients.BlockWebsocket do
     An incoming message can be a successful initialization event or a transaction status event.
     Types of messages sent to blocknative:
     Initialization payload:
-
       {
         "timeStamp":"2021-01-11T06:21:40.197Z",
         "dappId":"xyz",
@@ -30,10 +29,19 @@ defmodule Assignment.Clients.BlockWebsocket do
         "eventCode":"checkDappId"
       }
 
-    Get status of a transaction:
+    Initialization response payload:
+      {
+        "connectionId": "C4-e78f1dcd-920e-48ea-bff8-d39f88719151",
+        "serverVersion": "0.122.2",
+        "showUX": true,
+        "status": "ok",
+        "version": 0
+      }
+
+    Get status of a transaction payload:
       {
           "timeStamp": "2021-01-11T06:21:40.197Z",
-          "dappId": "a75f09b8-c506-43c3-a116-d0402152a676",
+          "dappId": "xyz",
           "version": "1",
           "blockchain": {
               "system": "ethereum",
@@ -82,7 +90,7 @@ defmodule Assignment.Clients.BlockWebsocket do
   def handle_info({:check_tx_status, tx_id}, state) do
     case :ets.lookup(:pending_tx_ids, tx_id) do
       [{^tx_id, user_id}] ->
-        Slack.send_tx_status_message(user_id, tx_id, "pending")
+        Slack.send_tx_status_message(user_id, tx_id, "Pending for more than 2 minutes")
 
       _ ->
         :ok
@@ -141,11 +149,20 @@ defmodule Assignment.Clients.BlockWebsocket do
       _ ->
         {:ok, state}
     end
-
-    {:ok, state}
   end
 
-  defp handle_message({:ok, %{"status" => "ok"}}, state) do
+  @doc """
+  Handles event for successful initialization. Example response:
+    {
+    "connectionId": "C4-e78f1dcd-920e-48ea-bff8-d39f88719151",
+    "serverVersion": "0.122.2",
+    "showUX": true,
+    "status": "ok",
+    "version": 0
+    }
+  """
+  defp handle_message({:ok, %{"status" => "ok"}} = msg, state) do
+    IO.inspect(msg)
     initialization_request = make_initialization_payload()
     {:reply, {:text, Jason.encode!(initialization_request)}, state}
   end
