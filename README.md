@@ -22,6 +22,7 @@ To get pending transactions:
 
 To get confirmed transactions per user_id:
 `GET http://localhost:4000/confirmed_transactions?user_id=<user_id>`
+
 The above api is written so that in case the user websocket disconnects before they get any status update,
 the front end can call the api to get all the list of confirmed transactions within the timeframe.
 
