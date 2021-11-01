@@ -56,13 +56,20 @@ defmodule Assignment.Clients.BlockWebsocket do
       }
 
     When transaction is confirmed we get a message with event code: `txConfirmed`
-
-
-
   """
   alias Assignment.Clients.Slack
   use WebSockex
   require Logger
+
+  @defaults %{
+    "timeStamp" => DateTime.to_iso8601(DateTime.now!("Etc/UTC")),
+    "dappId" => Application.get_env(:assignment, :dapp_id),
+    "version" => "1",
+    "blockchain" => %{
+      "system" => "ethereum",
+      "network" => "main"
+    }
+  }
   @doc false
   def start_link(url) do
     WebSockex.start_link(url, __MODULE__, :blocknative)
@@ -103,6 +110,7 @@ defmodule Assignment.Clients.BlockWebsocket do
     handle_message(Jason.decode(msg), state)
   end
 
+  # Private functions to handle incoming messages
   defp handle_message(
          {:ok, %{"event" => %{"categoryCode" => "initialize"}, "status" => "ok"}},
          state
@@ -151,18 +159,7 @@ defmodule Assignment.Clients.BlockWebsocket do
     end
   end
 
-  @doc """
-  Handles event for successful initialization. Example response:
-    {
-    "connectionId": "C4-e78f1dcd-920e-48ea-bff8-d39f88719151",
-    "serverVersion": "0.122.2",
-    "showUX": true,
-    "status": "ok",
-    "version": 0
-    }
-  """
-  defp handle_message({:ok, %{"status" => "ok"}} = msg, state) do
-    IO.inspect(msg)
+  defp handle_message({:ok, %{"status" => "ok"}}, state) do
     initialization_request = make_initialization_payload()
     {:reply, {:text, Jason.encode!(initialization_request)}, state}
   end
@@ -170,18 +167,6 @@ defmodule Assignment.Clients.BlockWebsocket do
   defp handle_message(msg, state) do
     Logger.info("Received from blocknative#{inspect(msg)}")
     {:ok, state}
-  end
-
-  defp get_defaults do
-    %{
-      "timeStamp" => DateTime.to_iso8601(DateTime.now!("Etc/UTC")),
-      "dappId" => Application.get_env(:assignment, :dapp_id),
-      "version" => "1",
-      "blockchain" => %{
-        "system" => "ethereum",
-        "network" => "main"
-      }
-    }
   end
 
   @doc """
@@ -193,17 +178,13 @@ defmodule Assignment.Clients.BlockWebsocket do
   end
 
   defp make_initialization_payload do
-    data = get_defaults()
-
-    data
+    @defaults
     |> Map.put("categoryCode", "initialize")
     |> Map.put("eventCode", "checkDappId")
   end
 
   defp make_tx_status_payload(tx_id) do
-    data = get_defaults()
-
-    data
+    @defaults
     |> Map.put("categoryCode", "accountAddress")
     |> Map.put("eventCode", "txSent")
     |> Map.put(
