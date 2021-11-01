@@ -141,7 +141,6 @@ defmodule Assignment.Clients.BlockWebsocket do
           Jason.encode!(%{tx_id: tx_id, status: "pending"})
         )
 
-        Slack.send_tx_status_message(user_id, tx_id, "pending")
         {:ok, state}
 
       _ ->
