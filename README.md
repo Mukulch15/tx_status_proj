@@ -1,4 +1,4 @@
-# Assignment
+
 
 Web application that gives you real time ethereum transaction updates over a websocket.
 You will need to setup the following environment variables before running the app:
